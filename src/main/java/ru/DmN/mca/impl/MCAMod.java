@@ -2,9 +2,6 @@ package ru.DmN.mca.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.DmN.mca.api.IModClientInitializer;
-import ru.DmN.mca.api.IModInitializer;
-import ru.DmN.mca.impl.exception.MCAModInitException;
 
 public final class MCAMod {
     private final @NotNull String modid;

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import ru.DmN.mca.api.IModClientInitializer;
 import ru.DmN.mca.api.IModInitializer;
 import ru.DmN.mca.impl.exception.MCALoaderException;
-import ru.DmN.mca.impl.exception.MCAMetadataReadException;
+import ru.DmN.mca.impl.exception.MCAModLoadException;
 import ru.DmN.mca.impl.exception.MCAModInitException;
 
 import java.io.*;
@@ -110,15 +110,15 @@ public abstract class MCALoader {
 
                 if (metadata.has("modid"))
                     modid = metadata.get("modid").getAsString();
-                else throw new MCAMetadataReadException("Modid for \"" + metadataURL + "\" not founded");
+                else throw new MCAModLoadException(String.format("Modid for '%s' not founded", metadataURL));
 
                 if (metadata.has("version"))
                     version = metadata.get("version").getAsString();
-                else throw new MCAMetadataReadException("Version for \"" + metadataURL + "\" not founded");
+                else throw new MCAModLoadException(String.format("Version for '%s' not founded", metadataURL));
 
                 if (metadata.has("name"))
                     name = metadata.get("name").getAsString();
-                else throw new MCAMetadataReadException("Name for \"" + metadataURL + "\" not founded");
+                else name = modid;
 
                 if (metadata.has("authors")) {
                     JsonArray authorsJson = metadata.get("authors").getAsJsonArray();
@@ -165,15 +165,28 @@ public abstract class MCALoader {
                     }
                 } else dependencies = null;
 
-                LOGGER.info("Parsed \"{}\" mod metadata", modid);
+                LOGGER.info("Successful parsed \"{}\" metadata", modid);
+
+                if (MCA_MODS.stream().anyMatch(it -> it.getModid().equals(modid)))
+                    throw new MCAModLoadException(String.format("Modid duplication for '%s'", modid));
                 MCA_MODS.add(new MCAMod(modid, version, name, authors, contacts, dependencies));
             } catch (IOException e) {
                 LOGGER.error("Error on loading \"{}\" mod", metadataURL);
-                throw new MCALoaderException(e);
+                throw new MCAModLoadException(e);
             }
         }
 
-        // todo: check dependencies
+        for (MCAMod mod : MCA_MODS) {
+            if (mod.getDependencies() == null)
+                continue;
+            for (MCAMod.Dependency dependency : mod.getDependencies()) {
+                Optional<MCAMod> find = MCA_MODS.stream().filter(it -> it.getModid().equals(dependency.getModid())).findFirst();
+                if (!find.isPresent())
+                    throw new MCAModLoadException(String.format("Missing dependency: mod '%s' requires '%s', but it is not found", mod.getModid(), dependency.getModid()));
+                if (Semver.satisfies(find.get().getVersion(), dependency.getVersion()))
+                    throw new MCAModLoadException(String.format("Dependency version mismatch: mod '%s' requires '%s' version %s, but found version %s", mod.getModid(), dependency.getModid(), dependency.getVersion(), find.get().getVersion()));
+            }
+        }
 
         MCA_MODS_INIT_CACHE = Pair.of(
                 commonEntries.stream().map((clazz) -> {
@@ -205,6 +218,98 @@ public abstract class MCALoader {
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | MalformedURLException e) {
             throw new MCALoaderException(e);
+        }
+    }
+
+    private static class Semver implements Comparable<Semver> {
+        final int major;
+        final int minor;
+        final int patch;
+        final String prerelease; // может быть null
+
+        private Semver(int major, int minor, int patch, String prerelease) {
+            this.major = major;
+            this.minor = minor;
+            this.patch = patch;
+            this.prerelease = prerelease;
+        }
+
+        public static Semver parse(String version) {
+            String[] parts = version.split("-", 2);
+            String core = parts[0];
+            String prerelease = parts.length > 1 ? parts[1] : null;
+
+            String[] numbers = core.split("\\.");
+            int major = numbers.length > 0 ? Integer.parseInt(numbers[0]) : 0;
+            int minor = numbers.length > 1 ? Integer.parseInt(numbers[1]) : 0;
+            int patch = numbers.length > 2 ? Integer.parseInt(numbers[2]) : 0;
+
+            return new Semver(major, minor, patch, prerelease);
+        }
+
+        public static boolean satisfies(String version, String requirement) {
+            String operator = "=";
+            String targetVersionStr = requirement.trim();
+
+            if (targetVersionStr.startsWith(">=")) {
+                operator = ">=";
+                targetVersionStr = targetVersionStr.substring(2).trim();
+            } else if (targetVersionStr.startsWith("<=")) {
+                operator = "<=";
+                targetVersionStr = targetVersionStr.substring(2).trim();
+            } else if (targetVersionStr.startsWith(">")) {
+                operator = ">";
+                targetVersionStr = targetVersionStr.substring(1).trim();
+            } else if (targetVersionStr.startsWith("<")) {
+                operator = "<";
+                targetVersionStr = targetVersionStr.substring(1).trim();
+            } else if (targetVersionStr.startsWith("~")) {
+                operator = "~";
+                targetVersionStr = targetVersionStr.substring(1).trim();
+            } else if (targetVersionStr.startsWith("^")) {
+                operator = "^";
+                targetVersionStr = targetVersionStr.substring(1).trim();
+            }
+
+            Semver targetVer = Semver.parse(targetVersionStr);
+            Semver actualVer = Semver.parse(version);
+
+            switch (operator) {
+                case "=":
+                    return actualVer.compareTo(targetVer) == 0;
+                case ">=":
+                    return actualVer.compareTo(targetVer) >= 0;
+                case "<=":
+                    return actualVer.compareTo(targetVer) <= 0;
+                case ">":
+                    return actualVer.compareTo(targetVer) > 0;
+                case "<":
+                    return actualVer.compareTo(targetVer) < 0;
+                case "~":
+                    Semver upper = new Semver(targetVer.major, targetVer.minor + 1, 0, null);
+                    return actualVer.compareTo(targetVer) >= 0 && actualVer.compareTo(upper) < 0;
+                case "^":
+                    Semver upperCaret = new Semver(targetVer.major + 1, 0, 0, null);
+                    return actualVer.compareTo(targetVer) >= 0 && actualVer.compareTo(upperCaret) < 0;
+                default:
+                    return false;
+            }
+        }
+
+
+        @Override
+        public int compareTo(Semver other) {
+            int cmp = Integer.compare(this.major, other.major);
+            if (cmp != 0) return cmp;
+            cmp = Integer.compare(this.minor, other.minor);
+            if (cmp != 0) return cmp;
+            cmp = Integer.compare(this.patch, other.patch);
+            if (cmp != 0) return cmp;
+
+            if (this.prerelease == null && other.prerelease == null) return 0;
+            if (this.prerelease == null) return 1;
+            if (other.prerelease == null) return -1;
+            return this.prerelease.compareTo(other.prerelease);
         }
     }
 }
