@@ -4,10 +4,17 @@ plugins {
     `maven-publish`
     `java-library`
     signing
+    kotlin("jvm")
 }
 
 group = "io.github.domaman202"
-version = "1.0.0"
+version = "1.2.0"
+
+dependencies {
+    implementation("org.apache.logging.log4j:log4j-api:2.0")
+    implementation("org.apache.commons:commons-lang3:3.20.0")
+    implementation("com.google.code.gson:gson:2.14.0")
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -78,4 +85,13 @@ nmcpAggregation {
 signing {
     useGpgCmd()
     sign(publishing.publications["mavenJava"])
+}
+dependencies {
+    implementation(kotlin("stdlib-jdk8"))
+}
+repositories {
+    mavenCentral()
+}
+kotlin {
+    jvmToolchain(8)
 }
