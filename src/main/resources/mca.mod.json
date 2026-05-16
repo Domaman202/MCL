@@ -15,7 +15,7 @@
       "ru.DmN.mca.example.ExampleMod"
     ],
     "client": [
-      "ru.DmN.mca.example.ExampleModClient"
+      "ru.DmN.mca.example.ExampleMod"
     ]
   },
   "dependencies": {
