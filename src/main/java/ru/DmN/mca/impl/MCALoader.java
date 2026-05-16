@@ -197,7 +197,7 @@ public abstract class MCALoader {
                 Optional<MCAMod> find = MCA_MODS.stream().filter(it -> it.getModid().equals(dependency.getModid())).findFirst();
                 if (!find.isPresent())
                     throw new MCAModLoadException(String.format("Missing dependency: mod '%s' requires '%s', but it is not found", mod.getModid(), dependency.getModid()));
-                if (Semver.satisfies(find.get().getVersion(), dependency.getVersion()))
+                if (!Semver.satisfies(find.get().getVersion(), dependency.getVersion()))
                     throw new MCAModLoadException(String.format("Dependency version mismatch: mod '%s' requires '%s' version %s, but found version %s", mod.getModid(), dependency.getModid(), dependency.getVersion(), find.get().getVersion()));
             }
         }
