@@ -1,0 +1,24 @@
+{
+  "id": "mca-example",
+  "version": "1.0.0",
+  "name": "Example MCA Mod",
+  "description": "This is example of MCA!",
+  "authors": [
+    "DomamaN202"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Domaman202/MCA",
+    "sources": "https://github.com/Domaman202/MCA/tree/example"
+  },
+  "entry": {
+    "common": [
+      "ru.DmN.mca.example.ExampleMod"
+    ],
+    "client": [
+      "ru.DmN.mca.example.ExampleModClient"
+    ]
+  },
+  "dependencies": {
+    "mca-loader": ">=1.0.0"
+  }
+}
