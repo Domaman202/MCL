@@ -91,6 +91,20 @@ public abstract class MCALoader {
     }
 
     private void initModsList(URLClassLoader loader) throws IOException {
+        MCA_MODS.add(
+                new MCAMod(
+                        "mca-loader",
+                        "1.0.0",
+                        "MCALoader",
+                        new String[]{"DomamaN202"},
+                        new MCAMod.Contacts(
+                                "https://github.com/Domaman202/MCA",
+                                "https://github.com/Domaman202/MCA/tree/api"
+                        ),
+                        null
+                )
+        );
+
         List<String> commonEntries = new ArrayList<>();
         List<String> clientEntries = new ArrayList<>();
 
