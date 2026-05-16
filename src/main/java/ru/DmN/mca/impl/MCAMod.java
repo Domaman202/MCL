@@ -7,21 +7,24 @@ public final class MCAMod {
     private final @NotNull String modid;
     private final @NotNull String version;
     private final @NotNull String name;
+    private final @Nullable String description;
     private final @Nullable String[] authors;
     private final @Nullable Contacts contacts;
     private final @Nullable Dependency[] dependencies;
 
     public MCAMod(
-        @NotNull String modid,
-        @NotNull String version,
-        @NotNull String name,
-        @Nullable String[] authors,
-        @Nullable Contacts contacts,
-        @Nullable Dependency[] dependencies
+            @NotNull String modid,
+            @NotNull String version,
+            @NotNull String name,
+            @Nullable String description,
+            @Nullable String[] authors,
+            @Nullable Contacts contacts,
+            @Nullable Dependency[] dependencies
     ) {
         this.modid = modid;
         this.version = version;
         this.name = name;
+        this.description = description;
         this.authors = authors;
         this.contacts = contacts;
         this.dependencies = dependencies;
@@ -37,6 +40,10 @@ public final class MCAMod {
 
     public @NotNull String getName() {
         return this.name;
+    }
+
+    public @Nullable String getDescription() {
+        return this.description;
     }
 
     public @Nullable String[] getAuthors() {

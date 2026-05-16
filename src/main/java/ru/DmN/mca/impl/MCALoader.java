@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 public abstract class MCALoader {
     protected static MCALoader INSTANCE; // Инициализируется в реализации
     public final Logger LOGGER = LogManager.getLogger(MCALoader.class);
-    private final List<MCAMod> MCA_MODS = new ArrayList<>();
+    private List<MCAMod> MCA_MODS = new ArrayList<>();
     private Pair<List<IModInitializer>, List<IModClientInitializer>> MCA_MODS_INIT_CACHE;
 
     public static @NotNull MCALoader getInstance() {
@@ -96,6 +97,7 @@ public abstract class MCALoader {
                         "mca-loader",
                         "1.0.0",
                         "MCALoader",
+                        "Minecraft-Cross-API Loader",
                         new String[]{"DomamaN202"},
                         new MCAMod.Contacts(
                                 "https://github.com/Domaman202/MCA",
@@ -118,6 +120,7 @@ public abstract class MCALoader {
                 String modid;
                 String version;
                 String name;
+                String description;
                 String[] authors;
                 MCAMod.Contacts contacts;
                 MCAMod.Dependency[] dependencies;
@@ -133,6 +136,10 @@ public abstract class MCALoader {
                 if (metadata.has("name"))
                     name = metadata.get("name").getAsString();
                 else name = modid;
+
+                if (metadata.has("description"))
+                    description = metadata.get("description").getAsString();
+                else description = null;
 
                 if (metadata.has("authors")) {
                     JsonArray authorsJson = metadata.get("authors").getAsJsonArray();
@@ -183,7 +190,9 @@ public abstract class MCALoader {
 
                 if (MCA_MODS.stream().anyMatch(it -> it.getModid().equals(modid)))
                     throw new MCAModLoadException(String.format("Modid duplication for '%s'", modid));
-                MCA_MODS.add(new MCAMod(modid, version, name, authors, contacts, dependencies));
+                MCA_MODS.add(new MCAMod(modid, version, name, description, authors, contacts, dependencies));
+
+                MCA_MODS = UnmodifiableList.unmodifiableList(MCA_MODS);
             } catch (IOException e) {
                 LOGGER.error("Error on loading \"{}\" mod", metadataURL);
                 throw new MCAModLoadException(e);

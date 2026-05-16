@@ -8,11 +8,12 @@ plugins {
 }
 
 group = "io.github.domaman202"
-version = "1.3.2"
+version = "1.3.4"
 
 dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.0")
     implementation("org.apache.commons:commons-lang3:3.20.0")
+    implementation("org.apache.commons:commons-collections4:4.5.0")
     implementation("com.google.code.gson:gson:2.14.0")
 }
 
