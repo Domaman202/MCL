@@ -184,10 +184,10 @@ public abstract class MCALoader {
 
                 if (metadata.has("dependencies")) {
                     JsonObject dependenciesJson = metadata.get("dependencies").getAsJsonObject();
-                    Map<String, JsonElement> dependenciesMap = dependenciesJson.asMap();
+                    Set<Map.Entry<String, JsonElement>> dependenciesMap = dependenciesJson.entrySet();
                     dependencies = new MCAMod.Dependency[dependenciesMap.size()];
                     int i = 0;
-                    for (Map.Entry<String, JsonElement> entry : dependenciesMap.entrySet()) {
+                    for (Map.Entry<String, JsonElement> entry : dependenciesMap) {
                         dependencies[i] = new MCAMod.Dependency(entry.getKey(), entry.getValue().getAsString());
                         i++;
                     }
