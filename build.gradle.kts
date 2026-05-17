@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.domaman202"
-version = "1.3.4"
+version = "1.4.0"
 
 dependencies {
     implementation("org.apache.logging.log4j:log4j-api:2.0")
