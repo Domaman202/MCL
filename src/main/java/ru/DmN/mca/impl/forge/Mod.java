@@ -3,6 +3,7 @@ package ru.DmN.mca.impl.forge;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -49,6 +50,7 @@ public class Mod {
     private static void injectMCAModsToForgeList() {
         try {
             Loader loader = Loader.instance();
+            boolean isClient = MCALoaderImpl.getInstance().isMinecraftClient();
 
             Field fieldMods = Loader.class.getDeclaredField("mods");
             Field fieldNamedMods = Loader.class.getDeclaredField("namedMods");
@@ -61,10 +63,13 @@ public class Mod {
             List<ModContainer> newMods = Lists.newArrayList(mods);
             Map<String, ModContainer> newNamedMods = new HashMap<>(namedMods);
             for (MCAMod mod : MCALoader.getInstance().getMods()) {
-                ModContainer decorator = new MCAModContainerDecorator(mod);
+                ModContainer decorator = new MCAModContainer(mod);
                 newMods.add(decorator);
                 newNamedMods.put(mod.getModid(), decorator);
                 activeModList.add(decorator);
+                if (isClient) {
+                    FMLClientHandler.instance().addModAsResource(decorator);
+                }
             }
             fieldMods.set(loader, ImmutableList.copyOf(newMods));
             fieldNamedMods.set(loader, ImmutableMap.copyOf(newNamedMods));
