@@ -20,6 +20,6 @@
     ]
   },
   "dependencies": {
-    "mca-loader": ">=1.0.0"
+    "mca-loader": ">=1.1.0"
   }
 }

@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.domaman202:MCA:1.6.1")
+    implementation("io.github.domaman202:MCA:1.7.0")
 }
 
 tasks.test {
