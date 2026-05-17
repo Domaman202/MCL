@@ -30,9 +30,9 @@ public abstract class MCALoader {
     public final Logger LOGGER = LogManager.getLogger(MCALoader.class);
 
     protected final URLClassLoader classLoader;
-    protected List<MCAMod> mcaMods = new ArrayList<>();
+    protected List<MCAMod> mods = new ArrayList<>();
 
-    private Pair<List<IModInitializer>, List<IModClientInitializer>> mcaModsInitCache;
+    private Pair<List<IModInitializer>, List<IModClientInitializer>> _modsInitCache;
 
     protected MCALoader(URLClassLoader classLoader) {
         this.classLoader = classLoader;
@@ -47,7 +47,12 @@ public abstract class MCALoader {
     }
 
     public List<MCAMod> getMods() {
-        return this.mcaMods;
+        return this.mods;
+    }
+
+    public boolean isModLoaded(String modid, String version) {
+        Optional<MCAMod> mod = this.mods.stream().filter(it -> it.getModid().equals(modid)).findFirst();
+        return mod.isPresent() && Semver.satisfies(mod.get().getVersion(), version);
     }
 
     protected void init() {
@@ -60,37 +65,37 @@ public abstract class MCALoader {
     }
 
     protected void launchPreInitInitialization() {
-        for (IModInitializer initializer : this.mcaModsInitCache.getLeft()) {
+        for (IModInitializer initializer : this._modsInitCache.getLeft()) {
             initializer.preInit();
         }
         if (this.isMinecraftClient()) {
-            for (IModClientInitializer initializer : this.mcaModsInitCache.getRight()) {
+            for (IModClientInitializer initializer : this._modsInitCache.getRight()) {
                 initializer.preInitClient();
             }
         }
     }
 
     protected void launchInitInitialization() {
-        for (IModInitializer initializer : this.mcaModsInitCache.getLeft()) {
+        for (IModInitializer initializer : this._modsInitCache.getLeft()) {
             initializer.init();
         }
         if (this.isMinecraftClient()) {
-            for (IModClientInitializer initializer : this.mcaModsInitCache.getRight()) {
+            for (IModClientInitializer initializer : this._modsInitCache.getRight()) {
                 initializer.initClient();
             }
         }
     }
 
     protected void launchPostInitInitialization() {
-        for (IModInitializer initializer : this.mcaModsInitCache.getLeft()) {
+        for (IModInitializer initializer : this._modsInitCache.getLeft()) {
             initializer.postInit();
         }
         if (this.isMinecraftClient()) {
-            for (IModClientInitializer initializer : this.mcaModsInitCache.getRight()) {
+            for (IModClientInitializer initializer : this._modsInitCache.getRight()) {
                 initializer.postInitClient();
             }
         }
-        this.mcaModsInitCache = null;
+        this._modsInitCache = null;
     }
 
     private void initModsDirectoryAndAddToLoader() {
@@ -104,13 +109,13 @@ public abstract class MCALoader {
     }
 
     private void initModsList() throws IOException {
-        this.mcaMods.add(
+        this.mods.add(
                 new MCAMod(
                         this.getLoaderSource(),
                         "mca-loader",
-                        "1.7.0",
+                        "1.8.0",
                         "MCA Loader",
-                        "Minecraft-Cross-API Loader",
+                        "Minecraft Cross API Loader.",
                         "assets/mca-loader/icon.png",
                         new String[]{"DomamaN202"},
                         new MCAMod.Contacts(
@@ -210,20 +215,20 @@ public abstract class MCALoader {
 
                 LOGGER.info("Successful parsed \"{}\" metadata", modid);
 
-                if (this.mcaMods.stream().anyMatch(it -> it.getModid().equals(modid)))
+                if (this.mods.stream().anyMatch(it -> it.getModid().equals(modid)))
                     throw new MCAModLoadException(String.format("Modid duplication for '%s'", modid));
-                this.mcaMods.add(new MCAMod(source, modid, version, name, description, logo, authors, contacts, dependencies));
+                this.mods.add(new MCAMod(source, modid, version, name, description, logo, authors, contacts, dependencies));
             } catch (IOException e) {
                 LOGGER.error("Error on loading \"{}\" mod", metadataURL);
                 throw new MCAModLoadException(e);
             }
         }
 
-        for (MCAMod mod : this.mcaMods) {
+        for (MCAMod mod : this.mods) {
             if (mod.getDependencies() == null)
                 continue;
             for (MCAMod.Dependency dependency : mod.getDependencies()) {
-                Optional<MCAMod> find = this.mcaMods.stream().filter(it -> it.getModid().equals(dependency.getModid())).findFirst();
+                Optional<MCAMod> find = this.mods.stream().filter(it -> it.getModid().equals(dependency.getModid())).findFirst();
                 if (!find.isPresent())
                     throw new MCAModLoadException(String.format("Missing dependency: mod '%s' requires '%s', but it is not found", mod.getModid(), dependency.getModid()));
                 if (!Semver.satisfies(find.get().getVersion(), dependency.getVersion()))
@@ -231,7 +236,7 @@ public abstract class MCALoader {
             }
         }
 
-        this.mcaModsInitCache = Pair.of(
+        this._modsInitCache = Pair.of(
                 commonEntries.stream().map((clazz) -> {
                     try {
                         return (IModInitializer) Class.forName(clazz, false, this.classLoader).newInstance();
