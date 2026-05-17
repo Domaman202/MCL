@@ -3,7 +3,7 @@
 	"modList": [{
 		"modid": "${modId}",
 		"name": "${modName}",
-		"description": "MCA Loader.",
+		"description": "Minecraft-Cross-API Loader implementation",
 		"version": "${modVersion}",
 		"mcversion": "${minecraftVersion}",
 		"url": "https://github.com/Domaman202/MCA/tree/1.7.10",
