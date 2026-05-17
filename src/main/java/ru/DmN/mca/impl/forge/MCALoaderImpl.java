@@ -52,6 +52,6 @@ public final class MCALoaderImpl extends MCALoader {
 
     @Override
     protected @NotNull File getLoaderSource() {
-        return Loader.instance().getActiveModList().stream().filter(it -> it.getModId().equals("mca")).findFirst().get().getSource();
+        return Loader.instance().getActiveModList().stream().filter(it -> it.getModId().equals("mca-loader-impl")).findFirst().get().getSource();
     }
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 
 @cpw.mods.fml.common.Mod(modid = Mod.MODID, version = Tags.VERSION, name = "MCA", acceptedMinecraftVersions = "[1.7.10]")
 public class Mod {
-    public static final String MODID = "mca";
+    public static final String MODID = "mca-loader-impl";
 
     @cpw.mods.fml.common.Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
