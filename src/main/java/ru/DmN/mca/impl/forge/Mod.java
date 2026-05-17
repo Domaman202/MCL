@@ -25,8 +25,8 @@ import java.util.Map;
 
 @net.minecraftforge.fml.common.Mod(modid = Mod.MOD_ID, name = Mod.NAME, version = Mod.VERSION)
 public class Mod {
-	public static final String MOD_ID = "mca";
-	public static final String NAME = "MCA";
+	public static final String MOD_ID = "mca-loader-impl";
+	public static final String NAME = "Minecraft Cross API";
 	public static final String VERSION = "0@VERSION@";
 
 	@net.minecraftforge.fml.common.Mod.EventHandler

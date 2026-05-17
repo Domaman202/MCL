@@ -1,9 +1,9 @@
 [
 	{
-		"modid": "mca",
+		"modid": "mca-loader-impl",
 		"version": "0@VERSION@",
-		"name": "MCA",
-		"description": "Minecraft-Cross-API Loader implementation",
+		"name": "Minecraft Cross API",
+		"description": "Minecraft Cross API Loader implementation.",
 		"logoFile": "assets/mca-loader/icon.png",
 		"credits": "",
 		"authorList": ["DomamaN202"],
