@@ -14,9 +14,9 @@ public final class MCALoaderImpl extends MCALoader {
     static void init0() {
         if (MCALoader.INSTANCE != null)
             throw new MCALoaderException("Loader already initialized!");
-        MCALoaderImpl instance = new MCALoaderImpl((URLClassLoader) Loader.instance().getModClassLoader());
+        MCALoaderImpl instance = new MCALoaderImpl((URLClassLoader) Mod.class.getClassLoader());
         MCALoader.INSTANCE = instance;
-        instance.init((URLClassLoader) MCALoaderImpl.class.getClassLoader());
+        instance.init();
     }
 
     static void launchPreInitInitialization0() {
