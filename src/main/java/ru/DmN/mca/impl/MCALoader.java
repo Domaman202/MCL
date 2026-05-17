@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -103,7 +102,7 @@ public abstract class MCALoader {
                 new MCAMod(
                         "mca-loader",
                         "1.0.0",
-                        "MCALoader",
+                        "MCA Loader",
                         "Minecraft-Cross-API Loader",
                         new String[]{"DomamaN202"},
                         new MCAMod.Contacts(
@@ -198,8 +197,6 @@ public abstract class MCALoader {
                 if (this.mcaMods.stream().anyMatch(it -> it.getModid().equals(modid)))
                     throw new MCAModLoadException(String.format("Modid duplication for '%s'", modid));
                 this.mcaMods.add(new MCAMod(modid, version, name, description, authors, contacts, dependencies));
-
-                this.mcaMods = UnmodifiableList.unmodifiableList(this.mcaMods);
             } catch (IOException e) {
                 LOGGER.error("Error on loading \"{}\" mod", metadataURL);
                 throw new MCAModLoadException(e);
