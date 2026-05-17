@@ -1,0 +1,12 @@
+[
+	{
+		"modid": "mca",
+		"version": "0@VERSION@",
+		"name": "MCA",
+		"description": "Minecraft-Cross-API Loader implementation",
+		"logoFile": "assets/mca-loader/icon.png",
+		"credits": "",
+		"authorList": ["DomamaN202"],
+		"url": "https://github.com/Domaman202/MCA/tree/1.12.2"
+	}
+]
