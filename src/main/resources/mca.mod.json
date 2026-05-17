@@ -1,8 +1,9 @@
 {
   "modid": "mca-example",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "MCA ExampleMod",
   "description": "This is example of MCA!",
+  "logo": "assets/mca-example/icon.png",
   "authors": [
     "DomamaN202"
   ],
