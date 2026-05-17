@@ -3,31 +3,43 @@ package ru.DmN.mca.impl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+
 public final class MCAMod {
+    private final @Nullable File source;
     private final @NotNull String modid;
     private final @NotNull String version;
     private final @NotNull String name;
     private final @Nullable String description;
+    private final @Nullable String logo;
     private final @Nullable String[] authors;
     private final @Nullable Contacts contacts;
     private final @Nullable Dependency[] dependencies;
 
     public MCAMod(
+            @Nullable File source,
             @NotNull String modid,
             @NotNull String version,
             @NotNull String name,
             @Nullable String description,
+            @Nullable String logo,
             @Nullable String[] authors,
             @Nullable Contacts contacts,
             @Nullable Dependency[] dependencies
     ) {
+        this.source = source;
         this.modid = modid;
         this.version = version;
         this.name = name;
         this.description = description;
+        this.logo = logo;
         this.authors = authors;
         this.contacts = contacts;
         this.dependencies = dependencies;
+    }
+
+    public @Nullable File getSource() {
+        return this.source;
     }
 
     public @NotNull String getModid() {
@@ -44,6 +56,10 @@ public final class MCAMod {
 
     public @Nullable String getDescription() {
         return this.description;
+    }
+
+    public @Nullable String getLogo() {
+        return this.logo;
     }
 
     public @Nullable String[] getAuthors() {

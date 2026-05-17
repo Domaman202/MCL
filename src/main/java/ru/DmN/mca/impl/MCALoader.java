@@ -18,8 +18,10 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,10 @@ public abstract class MCALoader {
 
     public static @NotNull MCALoader getInstance() {
         return INSTANCE;
+    }
+
+    public URLClassLoader getClassLoader() {
+        return this.classLoader;
     }
 
     public List<MCAMod> getMods() {
@@ -100,10 +106,12 @@ public abstract class MCALoader {
     private void initModsList(URLClassLoader loader) throws IOException {
         this.mcaMods.add(
                 new MCAMod(
+                        this.getLoaderSource(),
                         "mca-loader",
                         "1.0.0",
                         "MCA Loader",
                         "Minecraft-Cross-API Loader",
+                        "assets/mca-loader/icon.png",
                         new String[]{"DomamaN202"},
                         new MCAMod.Contacts(
                                 "https://github.com/Domaman202/MCA",
@@ -123,13 +131,17 @@ public abstract class MCALoader {
             try {
                 JsonObject metadata = gson.fromJson(new InputStreamReader(metadataURL.openStream()), JsonObject.class);
 
+                File source;
                 String modid;
                 String version;
                 String name;
                 String description;
+                String logo;
                 String[] authors;
                 MCAMod.Contacts contacts;
                 MCAMod.Dependency[] dependencies;
+
+                source = extractModDirectory(metadataURL).toFile();
 
                 if (metadata.has("modid"))
                     modid = metadata.get("modid").getAsString();
@@ -146,6 +158,10 @@ public abstract class MCALoader {
                 if (metadata.has("description"))
                     description = metadata.get("description").getAsString();
                 else description = null;
+
+                if (metadata.has("logo"))
+                    logo = metadata.get("logo").getAsString();
+                else logo = null;
 
                 if (metadata.has("authors")) {
                     JsonArray authorsJson = metadata.get("authors").getAsJsonArray();
@@ -196,7 +212,7 @@ public abstract class MCALoader {
 
                 if (this.mcaMods.stream().anyMatch(it -> it.getModid().equals(modid)))
                     throw new MCAModLoadException(String.format("Modid duplication for '%s'", modid));
-                this.mcaMods.add(new MCAMod(modid, version, name, description, authors, contacts, dependencies));
+                this.mcaMods.add(new MCAMod(source, modid, version, name, description, logo, authors, contacts, dependencies));
             } catch (IOException e) {
                 LOGGER.error("Error on loading \"{}\" mod", metadataURL);
                 throw new MCAModLoadException(e);
@@ -235,6 +251,34 @@ public abstract class MCALoader {
 
     public abstract boolean isMinecraftClient();
     public abstract @NotNull File getMinecraftDirectory();
+    protected abstract @NotNull File getLoaderSource();
+
+    private static Path extractModDirectory(URL modJsonURL) {
+        try {
+            URI uri = modJsonURL.toURI();
+
+            if ("jar".equals(uri.getScheme())) {
+                String schemeSpecificPart = uri.getSchemeSpecificPart();
+                int separator = schemeSpecificPart.indexOf("!/");
+                if (separator == -1) {
+                    throw new IllegalArgumentException("Invalid jar URL: missing '!/'");
+                }
+
+                String jarUrlPart = schemeSpecificPart.substring(0, separator);
+                URI jarUri = new URI(jarUrlPart);
+                return new File(jarUri).toPath();
+            }
+
+            if ("file".equals(uri.getScheme())) {
+                Path resourcePath = new File(uri).toPath();
+                return resourcePath.getParent();
+            }
+
+            throw new IllegalArgumentException("Unsupported URL scheme: " + uri.getScheme());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to extract mod directory from URL: " + modJsonURL, e);
+        }
+    }
 
     private static void expandClassLoaderURLs(URLClassLoader loader, File[] urls) {
         try {
