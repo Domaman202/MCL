@@ -25,24 +25,18 @@ import java.util.Map;
 public class Mod {
     public static final String MODID = "mca";
 
-    @SidedProxy(clientSide = "ru.DmN.mca.impl.forge.ClientProxy", serverSide = "ru.DmN.mca.impl.forge.CommonProxy")
-    public static CommonProxy proxy;
-
     @cpw.mods.fml.common.Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        proxy.preInit(event);
         MCALoaderImpl.launchPreInitInitialization0();
     }
 
     @cpw.mods.fml.common.Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        proxy.init(event);
         MCALoaderImpl.launchInitInitialization0();
     }
 
     @cpw.mods.fml.common.Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        proxy.postInit(event);
         MCALoaderImpl.launchPostInitInitialization0();
         injectMCAModsToForgeList();
     }
