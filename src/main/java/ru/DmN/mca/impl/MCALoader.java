@@ -29,8 +29,8 @@ public abstract class MCALoader {
     protected static MCALoader INSTANCE; // Инициализируется в реализации
     public final Logger LOGGER = LogManager.getLogger(MCALoader.class);
 
-    private final URLClassLoader classLoader;
-    private List<MCAMod> mcaMods = new ArrayList<>();
+    protected final URLClassLoader classLoader;
+    protected List<MCAMod> mcaMods = new ArrayList<>();
 
     private Pair<List<IModInitializer>, List<IModClientInitializer>> mcaModsInitCache;
 
@@ -50,10 +50,10 @@ public abstract class MCALoader {
         return this.mcaMods;
     }
 
-    protected void init(URLClassLoader loader) {
+    protected void init() {
         try {
-            this.initModsDirectoryAndAddToLoader(loader);
-            this.initModsList(loader);
+            this.initModsDirectoryAndAddToLoader();
+            this.initModsList();
         } catch (Exception e) {
             throw new MCALoaderException(e);
         }
@@ -93,22 +93,22 @@ public abstract class MCALoader {
         this.mcaModsInitCache = null;
     }
 
-    private void initModsDirectoryAndAddToLoader(URLClassLoader loader) {
+    private void initModsDirectoryAndAddToLoader() {
         File modsDir = new File(this.getMinecraftDirectory(), "mods-mca");
         if (!modsDir.exists())
             modsDir.mkdir();
         File[] modFiles = modsDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (modFiles != null) {
-            expandClassLoaderURLs(loader, modFiles);
+            expandClassLoaderURLs(this.classLoader, modFiles);
         }
     }
 
-    private void initModsList(URLClassLoader loader) throws IOException {
+    private void initModsList() throws IOException {
         this.mcaMods.add(
                 new MCAMod(
                         this.getLoaderSource(),
                         "mca-loader",
-                        "1.0.0",
+                        "1.7.0",
                         "MCA Loader",
                         "Minecraft-Cross-API Loader",
                         "assets/mca-loader/icon.png",
@@ -125,7 +125,7 @@ public abstract class MCALoader {
         List<String> clientEntries = new ArrayList<>();
 
         Gson gson = new Gson();
-        Enumeration<URL> metadataURLs = loader.findResources("mca.mod.json");
+        Enumeration<URL> metadataURLs = this.classLoader.findResources("mca.mod.json");
         while (metadataURLs.hasMoreElements()) {
             URL metadataURL = metadataURLs.nextElement();
             try {
