@@ -8,10 +8,10 @@ import ru.DmN.mcl.impl.MCLMod;
 
 import java.io.File;
 
-public final class MCAModContainer extends DummyModContainer {
+public final class MCLModContainer extends DummyModContainer {
     private final MCLMod original;
 
-    public MCAModContainer(MCLMod original) {
+    public MCLModContainer(MCLMod original) {
         super(mcaModToForgeMetadata(original));
         this.original = original;
     }
