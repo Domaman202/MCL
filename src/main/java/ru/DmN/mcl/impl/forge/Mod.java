@@ -1,4 +1,4 @@
-package ru.DmN.mca.impl.forge;
+package ru.DmN.mcl.impl.forge;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -10,10 +10,8 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import ru.DmN.mca.impl.MCALoader;
-import ru.DmN.mca.impl.MCAMod;
-import ru.DmN.mca.impl.Tags;
-import ru.DmN.mca.impl.exception.MCALoaderException;
+import ru.DmN.mcl.impl.*;
+import ru.DmN.mcl.impl.exception.MCLException;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -26,24 +24,24 @@ public class Mod {
 
     @cpw.mods.fml.common.Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        MCALoaderImpl.launchPreInitInitialization0();
+        MCLImpl.launchPreInitInitialization0();
     }
 
     @cpw.mods.fml.common.Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        MCALoaderImpl.launchInitInitialization0();
+        MCLImpl.launchInitInitialization0();
     }
 
     @cpw.mods.fml.common.Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        MCALoaderImpl.launchPostInitInitialization0();
+        MCLImpl.launchPostInitInitialization0();
         injectMCAModsToForgeList();
     }
 
     private static void injectMCAModsToForgeList() {
         try {
             Loader loader = Loader.instance();
-            boolean isClient = MCALoaderImpl.getInstance().isMinecraftClient();
+            boolean isClient = MCLImpl.getInstance().isMinecraftClient();
 
             Field fieldMods = Loader.class.getDeclaredField("mods");
             Field fieldNamedMods = Loader.class.getDeclaredField("namedMods");
@@ -55,7 +53,7 @@ public class Mod {
 
             List<ModContainer> newMods = Lists.newArrayList(mods);
             Map<String, ModContainer> newNamedMods = new HashMap<>(namedMods);
-            for (MCAMod mod : MCALoader.getInstance().getMods()) {
+            for (MCLMod mod : MinecraftCrossLoader.getInstance().getMods()) {
                 ModContainer decorator = new MCAModContainer(mod);
                 newMods.add(decorator);
                 newNamedMods.put(mod.getModid(), decorator);
@@ -67,14 +65,14 @@ public class Mod {
             fieldMods.set(loader, ImmutableList.copyOf(newMods));
             fieldNamedMods.set(loader, ImmutableMap.copyOf(newNamedMods));
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new MCALoaderException(e);
+            throw new MCLException(e);
         }
     }
 
     static {
         try {
-            MCALoaderImpl.init0();
-        } catch (MCALoaderException e) {
+            MCLImpl.init0();
+        } catch (MCLException e) {
             throw new RuntimeException(e);
         }
     }
