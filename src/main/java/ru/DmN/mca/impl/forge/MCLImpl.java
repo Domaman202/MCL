@@ -4,35 +4,35 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
-import ru.DmN.mca.impl.MCALoader;
-import ru.DmN.mca.impl.exception.MCALoaderException;
+import ru.DmN.mcl.impl.MinecraftCrossLoader;
+import ru.DmN.mcl.impl.exception.MCLException;
 
 import java.io.File;
 import java.net.URLClassLoader;
 
-public final class MCALoaderImpl extends MCALoader {
+public final class MCLImpl extends MinecraftCrossLoader {
     static void init0() {
-        if (MCALoader.INSTANCE != null)
-            throw new MCALoaderException("Loader already initialized!");
-        MCALoaderImpl instance = new MCALoaderImpl((URLClassLoader) Mod.class.getClassLoader());
-        MCALoader.INSTANCE = instance;
+        if (MinecraftCrossLoader._INSTANCE != null)
+            throw new MCLException("Loader already initialized!");
+        MCLImpl instance = new MCLImpl((URLClassLoader) Mod.class.getClassLoader());
+        MinecraftCrossLoader._INSTANCE = instance;
         instance.init();
     }
 
     static void launchPreInitInitialization0() {
-        ((MCALoaderImpl) MCALoader.INSTANCE).launchPreInitInitialization();
+        ((MCLImpl) MinecraftCrossLoader._INSTANCE).launchPreInitInitialization();
     }
 
     static void launchInitInitialization0() {
-        ((MCALoaderImpl) MCALoader.INSTANCE).launchInitInitialization();
+        ((MCLImpl) MinecraftCrossLoader._INSTANCE).launchInitInitialization();
 
     }
 
     static void launchPostInitInitialization0() {
-        ((MCALoaderImpl) MCALoader.INSTANCE).launchPostInitInitialization();
+        ((MCLImpl) MinecraftCrossLoader._INSTANCE).launchPostInitInitialization();
     }
 
-    private MCALoaderImpl(URLClassLoader classLoader) {
+    private MCLImpl(URLClassLoader classLoader) {
         super(classLoader);
     }
 

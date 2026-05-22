@@ -1,12 +1,12 @@
 [
 	{
-		"modid": "mca-loader-impl",
+		"modid": "mcl_impl",
 		"version": "0@VERSION@",
-		"name": "Minecraft Cross API",
-		"description": "Minecraft Cross API Loader implementation.",
-		"logoFile": "assets/mca-loader/icon.png",
+		"name": "Minecraft Cross Loader",
+		"description": "Minecraft Cross Loader implementation.",
+		"logoFile": "assets/mcl/icon.png",
 		"credits": "",
 		"authorList": ["DomamaN202"],
-		"url": "https://github.com/Domaman202/MCA/tree/1.12.2"
+		"url": "https://github.com/Domaman202/MCL/tree/1.12.2"
 	}
 ]

@@ -5,19 +5,19 @@ import net.minecraftforge.fml.client.FMLFileResourcePack;
 import net.minecraftforge.fml.client.FMLFolderResourcePack;
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.ModMetadata;
-import ru.DmN.mca.impl.MCAMod;
+import ru.DmN.mcl.impl.MCLMod;
 
 import java.io.File;
 
-public final class MCAModContainer extends DummyModContainer {
-    private final MCAMod original;
+public final class MCLModContainer extends DummyModContainer {
+    private final MCLMod original;
 
-    public MCAModContainer(MCAMod original) {
+    public MCLModContainer(MCLMod original) {
         super(mcaModToForgeMetadata(original));
         this.original = original;
     }
 
-    public MCAMod getOriginal() {
+    public MCLMod getOriginal() {
         return this.original;
     }
 
@@ -46,13 +46,13 @@ public final class MCAModContainer extends DummyModContainer {
         return "MCAMod:"+this.getModId()+"{"+this.getVersion()+"}";
     }
 
-    private static ModMetadata mcaModToForgeMetadata(MCAMod mod) {
+    private static ModMetadata mcaModToForgeMetadata(MCLMod mod) {
         ModMetadata metadata = new ModMetadata();
         metadata.modId = mod.getModid();
         metadata.name = mod.getName();
         metadata.description = mod.getDescription();
         metadata.logoFile = mod.getLogo();
-        MCAMod.Contacts contacts = mod.getContacts();
+        MCLMod.Contacts contacts = mod.getContacts();
         if (contacts != null)
             metadata.url = contacts.getHomepage();
         metadata.version = mod.getVersion();
