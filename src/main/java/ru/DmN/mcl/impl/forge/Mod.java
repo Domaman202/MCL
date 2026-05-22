@@ -54,7 +54,7 @@ public class Mod {
             List<ModContainer> newMods = Lists.newArrayList(mods);
             Map<String, ModContainer> newNamedMods = new HashMap<>(namedMods);
             for (MCLMod mod : MinecraftCrossLoader.getInstance().getMods()) {
-                ModContainer decorator = new MCAModContainer(mod);
+                ModContainer decorator = new MCLModContainer(mod);
                 newMods.add(decorator);
                 newNamedMods.put(mod.getModid(), decorator);
                 activeModList.add(decorator);
