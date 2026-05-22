@@ -1,25 +1,25 @@
 {
-  "modid": "mca-example",
-  "version": "1.1.0",
-  "name": "MCA ExampleMod",
-  "description": "This is example of MCA!",
-  "logo": "assets/mca-example/icon.png",
+  "modid": "mcl_example",
+  "version": "1.2.0",
+  "name": "MCL Example mod",
+  "description": "This is example mod of MCL!",
+  "logo": "assets/mcl_example/icon.png",
   "authors": [
     "DomamaN202"
   ],
   "contact": {
-    "homepage": "https://github.com/Domaman202/MCA",
-    "sources": "https://github.com/Domaman202/MCA/tree/example"
+    "homepage": "https://github.com/Domaman202/MCL",
+    "sources": "https://github.com/Domaman202/MCL/tree/example"
   },
   "entry": {
     "common": [
-      "ru.DmN.mca.example.ExampleMod"
+      "ru.DmN.mcl.example.ExampleMod"
     ],
     "client": [
-      "ru.DmN.mca.example.ExampleMod"
+      "ru.DmN.mcl.example.ExampleMod"
     ]
   },
   "dependencies": {
-    "mca-loader": ">=1.8.0"
+    "mcl": ">=1.8.0"
   }
 }

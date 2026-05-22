@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-group = "ru.DmN.mca"
+group = "ru.DmN.mcl"
 version = "1.1.1"
 
 repositories {
@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.domaman202:MCA:1.8.0")
+    implementation("io.github.domaman202:MCL:1.9.0")
 }
 
 java {
