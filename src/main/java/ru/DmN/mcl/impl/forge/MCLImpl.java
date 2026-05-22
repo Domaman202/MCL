@@ -1,4 +1,4 @@
-package ru.DmN.mca.impl.forge;
+package ru.DmN.mcl.impl.forge;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
