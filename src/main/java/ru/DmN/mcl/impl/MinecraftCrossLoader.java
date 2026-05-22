@@ -1,4 +1,4 @@
-package ru.DmN.mca.impl;
+package ru.DmN.mcl.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -8,11 +8,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import ru.DmN.mca.api.IModClientInitializer;
-import ru.DmN.mca.api.IModInitializer;
-import ru.DmN.mca.impl.exception.MCALoaderException;
-import ru.DmN.mca.impl.exception.MCAModLoadException;
-import ru.DmN.mca.impl.exception.MCAModInitException;
+import ru.DmN.mcl.api.IModClientInitializer;
+import ru.DmN.mcl.api.IModInitializer;
+import ru.DmN.mcl.impl.exception.MCLException;
+import ru.DmN.mcl.impl.exception.MCLModLoadException;
+import ru.DmN.mcl.impl.exception.MCLModInitException;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -25,33 +25,33 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class MCALoader {
-    protected static MCALoader INSTANCE; // Инициализируется в реализации
-    public final Logger LOGGER = LogManager.getLogger(MCALoader.class);
+public abstract class MinecraftCrossLoader {
+    public final Logger LOGGER = LogManager.getLogger(MinecraftCrossLoader.class);
 
     protected final URLClassLoader classLoader;
-    protected List<MCAMod> mods = new ArrayList<>();
+    protected List<MCLMod> mods = new ArrayList<>();
 
+    protected static MinecraftCrossLoader _INSTANCE; // Инициализируется в реализации
     private Pair<List<IModInitializer>, List<IModClientInitializer>> _modsInitCache;
 
-    protected MCALoader(URLClassLoader classLoader) {
+    protected MinecraftCrossLoader(URLClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
-    public static @NotNull MCALoader getInstance() {
-        return INSTANCE;
+    public static @NotNull MinecraftCrossLoader getInstance() {
+        return _INSTANCE;
     }
 
     public URLClassLoader getClassLoader() {
         return this.classLoader;
     }
 
-    public List<MCAMod> getMods() {
+    public List<MCLMod> getMods() {
         return this.mods;
     }
 
     public boolean isModLoaded(String modid, String version) {
-        Optional<MCAMod> mod = this.mods.stream().filter(it -> it.getModid().equals(modid)).findFirst();
+        Optional<MCLMod> mod = this.mods.stream().filter(it -> it.getModid().equals(modid)).findFirst();
         return mod.isPresent() && Semver.satisfies(mod.get().getVersion(), version);
     }
 
@@ -60,7 +60,7 @@ public abstract class MCALoader {
             this.initModsDirectoryAndAddToLoader();
             this.initModsList();
         } catch (Exception e) {
-            throw new MCALoaderException(e);
+            throw new MCLException(e);
         }
     }
 
@@ -99,7 +99,7 @@ public abstract class MCALoader {
     }
 
     private void initModsDirectoryAndAddToLoader() {
-        File modsDir = new File(this.getMinecraftDirectory(), "mods-mca");
+        File modsDir = new File(this.getMinecraftDirectory(), "mods-mcl");
         if (!modsDir.exists())
             modsDir.mkdir();
         File[] modFiles = modsDir.listFiles((dir, name) -> name.endsWith(".jar"));
@@ -110,17 +110,17 @@ public abstract class MCALoader {
 
     private void initModsList() throws IOException {
         this.mods.add(
-                new MCAMod(
+                new MCLMod(
                         this.getLoaderSource(),
-                        "mca-loader",
+                        "mcl",
                         "1.8.0",
-                        "MCA Loader",
-                        "Minecraft Cross API Loader.",
-                        "assets/mca-loader/icon.png",
+                        "MCL",
+                        "Minecraft Cross Loader.",
+                        "assets/mcl/icon.png",
                         new String[]{"DomamaN202"},
-                        new MCAMod.Contacts(
-                                "https://github.com/Domaman202/MCA",
-                                "https://github.com/Domaman202/MCA/tree/api"
+                        new MCLMod.Contacts(
+                                "https://github.com/Domaman202/MCL",
+                                "https://github.com/Domaman202/MCL/tree/api"
                         ),
                         null
                 )
@@ -130,7 +130,7 @@ public abstract class MCALoader {
         List<String> clientEntries = new ArrayList<>();
 
         Gson gson = new Gson();
-        Enumeration<URL> metadataURLs = this.classLoader.findResources("mca.mod.json");
+        Enumeration<URL> metadataURLs = this.classLoader.findResources("mcl.mod.json");
         while (metadataURLs.hasMoreElements()) {
             URL metadataURL = metadataURLs.nextElement();
             try {
@@ -143,18 +143,18 @@ public abstract class MCALoader {
                 String description;
                 String logo;
                 String[] authors;
-                MCAMod.Contacts contacts;
-                MCAMod.Dependency[] dependencies;
+                MCLMod.Contacts contacts;
+                MCLMod.Dependency[] dependencies;
 
                 source = extractModDirectory(metadataURL).toFile();
 
                 if (metadata.has("modid"))
                     modid = metadata.get("modid").getAsString();
-                else throw new MCAModLoadException(String.format("Modid for '%s' not founded", metadataURL));
+                else throw new MCLModLoadException(String.format("Modid for '%s' not founded", metadataURL));
 
                 if (metadata.has("version"))
                     version = metadata.get("version").getAsString();
-                else throw new MCAModLoadException(String.format("Version for '%s' not founded", metadataURL));
+                else throw new MCLModLoadException(String.format("Version for '%s' not founded", metadataURL));
 
                 if (metadata.has("name"))
                     name = metadata.get("name").getAsString();
@@ -178,7 +178,7 @@ public abstract class MCALoader {
 
                 if (metadata.has("contact")) {
                     JsonObject contactJson = metadata.get("contact").getAsJsonObject();
-                    contacts = new MCAMod.Contacts(
+                    contacts = new MCLMod.Contacts(
                             contactJson.has("homepage") ? contactJson.get("homepage").getAsString() : null,
                             contactJson.has("sources") ? contactJson.get("sources").getAsString() : null
                     );
@@ -205,10 +205,10 @@ public abstract class MCALoader {
                 if (metadata.has("dependencies")) {
                     JsonObject dependenciesJson = metadata.get("dependencies").getAsJsonObject();
                     Set<Map.Entry<String, JsonElement>> dependenciesMap = dependenciesJson.entrySet();
-                    dependencies = new MCAMod.Dependency[dependenciesMap.size()];
+                    dependencies = new MCLMod.Dependency[dependenciesMap.size()];
                     int i = 0;
                     for (Map.Entry<String, JsonElement> entry : dependenciesMap) {
-                        dependencies[i] = new MCAMod.Dependency(entry.getKey(), entry.getValue().getAsString());
+                        dependencies[i] = new MCLMod.Dependency(entry.getKey(), entry.getValue().getAsString());
                         i++;
                     }
                 } else dependencies = null;
@@ -216,23 +216,23 @@ public abstract class MCALoader {
                 LOGGER.info("Successful parsed \"{}\" metadata", modid);
 
                 if (this.mods.stream().anyMatch(it -> it.getModid().equals(modid)))
-                    throw new MCAModLoadException(String.format("Modid duplication for '%s'", modid));
-                this.mods.add(new MCAMod(source, modid, version, name, description, logo, authors, contacts, dependencies));
+                    throw new MCLModLoadException(String.format("Modid duplication for '%s'", modid));
+                this.mods.add(new MCLMod(source, modid, version, name, description, logo, authors, contacts, dependencies));
             } catch (IOException e) {
                 LOGGER.error("Error on loading \"{}\" mod", metadataURL);
-                throw new MCAModLoadException(e);
+                throw new MCLModLoadException(e);
             }
         }
 
-        for (MCAMod mod : this.mods) {
+        for (MCLMod mod : this.mods) {
             if (mod.getDependencies() == null)
                 continue;
-            for (MCAMod.Dependency dependency : mod.getDependencies()) {
-                Optional<MCAMod> find = this.mods.stream().filter(it -> it.getModid().equals(dependency.getModid())).findFirst();
+            for (MCLMod.Dependency dependency : mod.getDependencies()) {
+                Optional<MCLMod> find = this.mods.stream().filter(it -> it.getModid().equals(dependency.getModid())).findFirst();
                 if (!find.isPresent())
-                    throw new MCAModLoadException(String.format("Missing dependency: mod '%s' requires '%s', but it is not found", mod.getModid(), dependency.getModid()));
+                    throw new MCLModLoadException(String.format("Missing dependency: mod '%s' requires '%s', but it is not found", mod.getModid(), dependency.getModid()));
                 if (!Semver.satisfies(find.get().getVersion(), dependency.getVersion()))
-                    throw new MCAModLoadException(String.format("Dependency version mismatch: mod '%s' requires '%s' version %s, but found version %s", mod.getModid(), dependency.getModid(), dependency.getVersion(), find.get().getVersion()));
+                    throw new MCLModLoadException(String.format("Dependency version mismatch: mod '%s' requires '%s' version %s, but found version %s", mod.getModid(), dependency.getModid(), dependency.getVersion(), find.get().getVersion()));
             }
         }
 
@@ -241,14 +241,14 @@ public abstract class MCALoader {
                     try {
                         return (IModInitializer) Class.forName(clazz, false, this.classLoader).newInstance();
                     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                        throw new MCAModInitException(e);
+                        throw new MCLModInitException(e);
                     }
                 }).collect(Collectors.toList()),
                 clientEntries.stream().map((clazz) -> {
                     try {
                         return (IModClientInitializer) Class.forName(clazz, false, this.classLoader).newInstance();
                     } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                        throw new MCAModInitException(e);
+                        throw new MCLModInitException(e);
                     }
                 }).collect(Collectors.toList())
         );
@@ -293,7 +293,7 @@ public abstract class MCALoader {
                 method.invoke(loader, url.toURI().toURL());
             }
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | MalformedURLException e) {
-            throw new MCALoaderException(e);
+            throw new MCLException(e);
         }
     }
 

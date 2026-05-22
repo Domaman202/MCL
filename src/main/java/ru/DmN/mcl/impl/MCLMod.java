@@ -1,11 +1,11 @@
-package ru.DmN.mca.impl;
+package ru.DmN.mcl.impl;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 
-public final class MCAMod {
+public final class MCLMod {
     private final @Nullable File source;
     private final @NotNull String modid;
     private final @NotNull String version;
@@ -16,7 +16,7 @@ public final class MCAMod {
     private final @Nullable Contacts contacts;
     private final @Nullable Dependency[] dependencies;
 
-    public MCAMod(
+    public MCLMod(
             @Nullable File source,
             @NotNull String modid,
             @NotNull String version,

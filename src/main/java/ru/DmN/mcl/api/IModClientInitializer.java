@@ -1,4 +1,4 @@
-package ru.DmN.mca.api;
+package ru.DmN.mcl.api;
 
 public interface IModClientInitializer {
     default void preInitClient() {}
