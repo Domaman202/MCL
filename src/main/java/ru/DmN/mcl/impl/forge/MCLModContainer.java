@@ -13,7 +13,7 @@ public final class MCLModContainer extends DummyModContainer {
     private final MCLMod original;
 
     public MCLModContainer(MCLMod original) {
-        super(mcaModToForgeMetadata(original));
+        super(mclModToForgeMetadata(original));
         this.original = original;
     }
 
@@ -46,7 +46,7 @@ public final class MCLModContainer extends DummyModContainer {
         return "MCAMod:"+this.getModId()+"{"+this.getVersion()+"}";
     }
 
-    private static ModMetadata mcaModToForgeMetadata(MCLMod mod) {
+    private static ModMetadata mclModToForgeMetadata(MCLMod mod) {
         ModMetadata metadata = new ModMetadata();
         metadata.modId = mod.getModid();
         metadata.name = mod.getName();
