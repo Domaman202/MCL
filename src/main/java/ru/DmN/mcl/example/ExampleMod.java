@@ -1,7 +1,7 @@
 package ru.DmN.mcl.example;
 
-import ru.DmN.mcl.api.IModClientInitializer;
-import ru.DmN.mcl.api.IModInitializer;
+import ru.DmN.mcl.api.initializer.IModClientInitializer;
+import ru.DmN.mcl.api.initializer.IModInitializer;
 
 public class ExampleMod implements IModInitializer, IModClientInitializer {
     @Override

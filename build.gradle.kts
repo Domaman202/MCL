@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "ru.DmN.mcl"
-version = "1.2.0"
+version = "1.3.0"
 
 repositories {
     mavenCentral()
@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.github.domaman202:MCL:1.9.0")
+    implementation("io.github.domaman202:MCL:1.10.1")
 }
 
 java {
