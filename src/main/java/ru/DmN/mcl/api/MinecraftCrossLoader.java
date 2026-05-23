@@ -277,7 +277,7 @@ public abstract class MinecraftCrossLoader {
 
     private static void expandClassLoaderURLs(URLClassLoader loader, File[] urls) {
         try {
-            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            Method method = loader.getClass().getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
             for (File url : urls) {
                 method.invoke(loader, url.toURI().toURL());
