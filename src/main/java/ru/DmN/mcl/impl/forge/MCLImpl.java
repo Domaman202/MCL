@@ -3,18 +3,20 @@ package ru.DmN.mcl.impl.forge;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModClassLoader;
 import org.jetbrains.annotations.NotNull;
 import ru.DmN.mcl.api.MinecraftCrossLoader;
 import ru.DmN.mcl.api.exception.MCLException;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URLClassLoader;
 
 public final class MCLImpl extends MinecraftCrossLoader {
     static void init0() {
         if (MinecraftCrossLoader._INSTANCE != null)
             throw new MCLException("Loader already initialized!");
-        MCLImpl instance = new MCLImpl((URLClassLoader) Mod.class.getClassLoader());
+        MCLImpl instance = new MCLImpl(Loader.instance().getModClassLoader());
         MinecraftCrossLoader._INSTANCE = instance;
         instance.init();
     }
@@ -53,5 +55,17 @@ public final class MCLImpl extends MinecraftCrossLoader {
     @Override
     public @NotNull File getLoaderSource() {
         return Loader.instance().getActiveModList().stream().filter(it -> it.getModId().equals("mcl_impl")).findFirst().get().getSource();
+    }
+
+    @Override
+    protected void expandClassLoaderClassPath(File[] paths) {
+        try {
+            ModClassLoader loader = Loader.instance().getModClassLoader();
+            for (File path : paths)
+                loader.addFile(path);
+            URLClassLoader$expandClassPath(loader, paths);
+        } catch (MalformedURLException e) {
+            throw new MCLException(e);
+        }
     }
 }
