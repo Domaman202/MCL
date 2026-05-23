@@ -29,13 +29,13 @@ import java.util.stream.Collectors;
 public abstract class MinecraftCrossLoader {
     public final Logger LOGGER = LogManager.getLogger(MinecraftCrossLoader.class);
 
-    protected final URLClassLoader classLoader;
+    protected final ClassLoader classLoader;
     protected List<MCLMod> mods = new ArrayList<>();
 
     protected static MinecraftCrossLoader _INSTANCE; // Инициализируется в реализации
     private Pair<List<IModInitializer>, List<IModClientInitializer>> _modsInitCache;
 
-    protected MinecraftCrossLoader(URLClassLoader classLoader) {
+    protected MinecraftCrossLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
@@ -43,7 +43,7 @@ public abstract class MinecraftCrossLoader {
         return _INSTANCE;
     }
 
-    public URLClassLoader getClassLoader() {
+    public ClassLoader getClassLoader() {
         return this.classLoader;
     }
 
@@ -105,7 +105,7 @@ public abstract class MinecraftCrossLoader {
             modsDir.mkdir();
         File[] modFiles = modsDir.listFiles((dir, name) -> name.endsWith(".jar"));
         if (modFiles != null) {
-            expandClassLoaderURLs(this.classLoader, modFiles);
+            this.expandClassLoaderClassPath(modFiles);
         }
     }
 
@@ -117,7 +117,7 @@ public abstract class MinecraftCrossLoader {
         List<String> clientEntries = new ArrayList<>();
 
         Gson gson = new Gson();
-        Enumeration<URL> metadataURLs = this.classLoader.findResources("mcl.mod.json");
+        Enumeration<URL> metadataURLs = ClassLoader$findResources(this.classLoader, "mcl.mod.json");
         while (metadataURLs.hasMoreElements()) {
             URL metadataURL = metadataURLs.nextElement();
             try {
@@ -247,6 +247,7 @@ public abstract class MinecraftCrossLoader {
     public abstract boolean isMinecraftClient();
     public abstract @NotNull File getMinecraftDirectory();
     public abstract @NotNull File getLoaderSource();
+    protected abstract void expandClassLoaderClassPath(File[] paths);
 
     private static Path extractModDirectory(URL modJsonURL) {
         try {
@@ -275,7 +276,17 @@ public abstract class MinecraftCrossLoader {
         }
     }
 
-    private static void expandClassLoaderURLs(URLClassLoader loader, File[] urls) {
+    protected static Enumeration<URL> ClassLoader$findResources(ClassLoader loader, String name) {
+        try {
+            Method method = loader.getClass().getDeclaredMethod("findResources", String.class);
+            method.setAccessible(true);
+            return (Enumeration<URL>) method.invoke(loader, name);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new MCLException(e);
+        }
+    }
+
+    protected static void URLClassLoader$expandClassPath(URLClassLoader loader, File[] urls) {
         try {
             Method method = loader.getClass().getDeclaredMethod("addURL", URL.class);
             method.setAccessible(true);
