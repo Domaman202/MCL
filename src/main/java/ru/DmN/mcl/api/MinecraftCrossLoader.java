@@ -1,4 +1,4 @@
-package ru.DmN.mcl.impl;
+package ru.DmN.mcl.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -8,9 +8,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import ru.DmN.mcl.api.IModClientInitializer;
-import ru.DmN.mcl.api.IModInitializer;
-import ru.DmN.mcl.impl.exception.MCLException;
+import ru.DmN.mcl.api.initializer.IModClientInitializer;
+import ru.DmN.mcl.api.initializer.IModInitializer;
+import ru.DmN.mcl.api.exception.MCLException;
+import ru.DmN.mcl.impl.MCLSystemMod;
 import ru.DmN.mcl.impl.exception.MCLModLoadException;
 import ru.DmN.mcl.impl.exception.MCLModInitException;
 
@@ -51,7 +52,7 @@ public abstract class MinecraftCrossLoader {
     }
 
     public boolean isModLoaded(String modid, String version) {
-        Optional<MCLMod> mod = this.mods.stream().filter(it -> it.getModid().equals(modid)).findFirst();
+        Optional<MCLMod> mod = this.mods.stream().filter(it -> it.getModId().equals(modid)).findFirst();
         return mod.isPresent() && Semver.satisfies(mod.get().getVersion(), version);
     }
 
@@ -109,22 +110,8 @@ public abstract class MinecraftCrossLoader {
     }
 
     private void initModsList() throws IOException {
-        this.mods.add(
-                new MCLMod(
-                        this.getLoaderSource(),
-                        "mcl",
-                        "1.8.0",
-                        "MCL",
-                        "Minecraft Cross Loader.",
-                        "assets/mcl/icon.png",
-                        new String[]{"DomamaN202"},
-                        new MCLMod.Contacts(
-                                "https://github.com/Domaman202/MCL",
-                                "https://github.com/Domaman202/MCL/tree/api"
-                        ),
-                        null
-                )
-        );
+        this.mods.add(new MCLSystemMod.MCL());
+        this.mods.add(new MCLSystemMod.MCA());
 
         List<String> commonEntries = new ArrayList<>();
         List<String> clientEntries = new ArrayList<>();
@@ -178,7 +165,7 @@ public abstract class MinecraftCrossLoader {
 
                 if (metadata.has("contact")) {
                     JsonObject contactJson = metadata.get("contact").getAsJsonObject();
-                    contacts = new MCLMod.Contacts(
+                    contacts = new MCLMod.Contacts.Default(
                             contactJson.has("homepage") ? contactJson.get("homepage").getAsString() : null,
                             contactJson.has("sources") ? contactJson.get("sources").getAsString() : null
                     );
@@ -208,16 +195,19 @@ public abstract class MinecraftCrossLoader {
                     dependencies = new MCLMod.Dependency[dependenciesMap.size()];
                     int i = 0;
                     for (Map.Entry<String, JsonElement> entry : dependenciesMap) {
-                        dependencies[i] = new MCLMod.Dependency(entry.getKey(), entry.getValue().getAsString());
+                        dependencies[i] = new MCLMod.Dependency.Default(
+                                entry.getKey(),
+                                entry.getValue().getAsString()
+                        );
                         i++;
                     }
                 } else dependencies = null;
 
                 LOGGER.info("Successful parsed \"{}\" metadata", modid);
 
-                if (this.mods.stream().anyMatch(it -> it.getModid().equals(modid)))
+                if (this.mods.stream().anyMatch(it -> it.getModId().equals(modid)))
                     throw new MCLModLoadException(String.format("Modid duplication for '%s'", modid));
-                this.mods.add(new MCLMod(source, modid, version, name, description, logo, authors, contacts, dependencies));
+                this.mods.add(new MCLMod.Default(source, modid, version, name, description, logo, authors, contacts, dependencies));
             } catch (IOException e) {
                 LOGGER.error("Error on loading \"{}\" mod", metadataURL);
                 throw new MCLModLoadException(e);
@@ -228,11 +218,11 @@ public abstract class MinecraftCrossLoader {
             if (mod.getDependencies() == null)
                 continue;
             for (MCLMod.Dependency dependency : mod.getDependencies()) {
-                Optional<MCLMod> find = this.mods.stream().filter(it -> it.getModid().equals(dependency.getModid())).findFirst();
+                Optional<MCLMod> find = this.mods.stream().filter(it -> it.getModId().equals(dependency.getModId())).findFirst();
                 if (!find.isPresent())
-                    throw new MCLModLoadException(String.format("Missing dependency: mod '%s' requires '%s', but it is not found", mod.getModid(), dependency.getModid()));
+                    throw new MCLModLoadException(String.format("Missing dependency: mod '%s' requires '%s', but it is not found", mod.getModId(), dependency.getModId()));
                 if (!Semver.satisfies(find.get().getVersion(), dependency.getVersion()))
-                    throw new MCLModLoadException(String.format("Dependency version mismatch: mod '%s' requires '%s' version %s, but found version %s", mod.getModid(), dependency.getModid(), dependency.getVersion(), find.get().getVersion()));
+                    throw new MCLModLoadException(String.format("Dependency version mismatch: mod '%s' requires '%s' version %s, but found version %s", mod.getModId(), dependency.getModId(), dependency.getVersion(), find.get().getVersion()));
             }
         }
 
@@ -256,7 +246,7 @@ public abstract class MinecraftCrossLoader {
 
     public abstract boolean isMinecraftClient();
     public abstract @NotNull File getMinecraftDirectory();
-    protected abstract @NotNull File getLoaderSource();
+    public abstract @NotNull File getLoaderSource();
 
     private static Path extractModDirectory(URL modJsonURL) {
         try {
