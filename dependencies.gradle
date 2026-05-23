@@ -1,5 +1,5 @@
 dependencies {
     compileOnly("org.jetbrains:annotations:26.1.0")
     implementation("com.google.code.gson:gson:2.2.4")
-    shadowImplementation("io.github.domaman202:MCL:1.10.0")
+    shadowImplementation("io.github.domaman202:MCL:1.11.1")
 }
