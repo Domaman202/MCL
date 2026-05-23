@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.client.FMLFileResourcePack;
 import cpw.mods.fml.client.FMLFolderResourcePack;
 import cpw.mods.fml.common.*;
-import ru.DmN.mcl.impl.MCLMod;
+import ru.DmN.mcl.api.MCLMod;
 
 import java.io.File;
 
@@ -33,7 +33,7 @@ public final class MCLModContainer extends DummyModContainer {
     @Override
     public Class<?> getCustomResourcePackClass() {
         File source = this.original.getSource();
-        if (source == null || !source.exists())
+        if (!source.exists())
             return null;
         if (source.isDirectory())
             return FMLFolderResourcePack.class;
@@ -47,7 +47,7 @@ public final class MCLModContainer extends DummyModContainer {
 
     private static ModMetadata mclModToForgeMetadata(MCLMod mod) {
         ModMetadata metadata = new ModMetadata();
-        metadata.modId = mod.getModid();
+        metadata.modId = mod.getModId();
         metadata.name = mod.getName();
         metadata.description = mod.getDescription();
         metadata.logoFile = mod.getLogo();

@@ -10,8 +10,10 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import ru.DmN.mcl.api.MCLMod;
+import ru.DmN.mcl.api.MinecraftCrossLoader;
+import ru.DmN.mcl.api.exception.MCLException;
 import ru.DmN.mcl.impl.*;
-import ru.DmN.mcl.impl.exception.MCLException;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -56,7 +58,7 @@ public class Mod {
             for (MCLMod mod : MinecraftCrossLoader.getInstance().getMods()) {
                 ModContainer decorator = new MCLModContainer(mod);
                 newMods.add(decorator);
-                newNamedMods.put(mod.getModid(), decorator);
+                newNamedMods.put(mod.getModId(), decorator);
                 activeModList.add(decorator);
                 if (isClient) {
                     FMLClientHandler.instance().addModAsResource(decorator);
