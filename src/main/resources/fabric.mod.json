@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "mcl_impl",
+	"version": "${version}",
+	"name": "MCL",
+	"description": "Minecraft Cross Loader implementation.",
+	"authors": [
+		"DomamaN202"
+	],
+	"contact": {
+		"homepage": "https://github.com/Domaman202/MCL/",
+		"sources": "https://github.com/Domaman202/MCL/tree/impl-fabric-26.1.2"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/mcl/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"ru.DmN.mcl.impl.fabric.Mod"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~26.1.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
