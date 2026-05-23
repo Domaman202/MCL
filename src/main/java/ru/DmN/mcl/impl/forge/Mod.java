@@ -11,9 +11,9 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.FMLThrowingEventBus;
-import ru.DmN.mcl.impl.MCLMod;
-import ru.DmN.mcl.impl.MinecraftCrossLoader;
-import ru.DmN.mcl.impl.exception.MCLException;
+import ru.DmN.mcl.api.MCLMod;
+import ru.DmN.mcl.api.MinecraftCrossLoader;
+import ru.DmN.mcl.api.exception.MCLException;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -76,7 +76,7 @@ public class Mod {
 				ModContainer decorator = new MCLModContainer(mod);
 
 				newMods.add(decorator);
-				newNamedMods.put(mod.getModid(), decorator);
+				newNamedMods.put(mod.getModId(), decorator);
 				newActiveModsList.add(decorator);
 				modStates.put(decorator.getModId(), LoaderState.ModState.AVAILABLE);
 				newEventChannels.put(decorator.getModId(), new FMLThrowingEventBus((exception, context) -> loadController.errorOccurred(decorator, exception)));

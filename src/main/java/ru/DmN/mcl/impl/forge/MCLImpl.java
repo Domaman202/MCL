@@ -4,8 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import org.jetbrains.annotations.NotNull;
-import ru.DmN.mcl.impl.MinecraftCrossLoader;
-import ru.DmN.mcl.impl.exception.MCLException;
+import ru.DmN.mcl.api.MinecraftCrossLoader;
+import ru.DmN.mcl.api.exception.MCLException;
 
 import java.io.File;
 import java.net.URLClassLoader;
@@ -51,7 +51,7 @@ public final class MCLImpl extends MinecraftCrossLoader {
     }
 
     @Override
-    protected @NotNull File getLoaderSource() {
+    public @NotNull File getLoaderSource() {
         return Loader.instance().getActiveModList().stream().filter(it -> it.getModId().equals("mcl_impl")).findFirst().get().getSource();
     }
 }
