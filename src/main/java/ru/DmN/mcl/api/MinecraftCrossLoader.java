@@ -14,8 +14,10 @@ import ru.DmN.mcl.api.exception.MCLException;
 import ru.DmN.mcl.impl.MCLSystemMod;
 import ru.DmN.mcl.impl.exception.MCLModLoadException;
 import ru.DmN.mcl.impl.exception.MCLModInitException;
+import sun.misc.Unsafe;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -109,7 +111,7 @@ public abstract class MinecraftCrossLoader {
         }
     }
 
-    private void initModsList() throws IOException {
+    private void initModsList() {
         this.mods.add(new MCLSystemMod.MCL());
         this.mods.add(new MCLSystemMod.MCA());
 
@@ -278,22 +280,44 @@ public abstract class MinecraftCrossLoader {
 
     protected static Enumeration<URL> ClassLoader$findResources(ClassLoader loader, String name) {
         try {
-            Method method = loader.getClass().getDeclaredMethod("findResources", String.class);
-            method.setAccessible(true);
+            Method method;
+            try {
+                method = loader.getClass().getDeclaredMethod("findResources", String.class);
+            } catch (NoSuchMethodException ignored) {
+                method = URLClassLoader.class.getDeclaredMethod("findResources", String.class);
+            }
+            try {
+                method.setAccessible(true);
+            } catch (Exception ignored) {
+                Field fieldTheUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+                fieldTheUnsafe.setAccessible(true);
+                ((Unsafe) fieldTheUnsafe.get(null)).putBoolean(method, 12, true);
+            }
             return (Enumeration<URL>) method.invoke(loader, name);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | NoSuchFieldException e) {
             throw new MCLException(e);
         }
     }
 
     protected static void URLClassLoader$expandClassPath(URLClassLoader loader, File[] urls) {
         try {
-            Method method = loader.getClass().getDeclaredMethod("addURL", URL.class);
-            method.setAccessible(true);
+            Method method;
+            try {
+                method = loader.getClass().getDeclaredMethod("addURL", URL.class);
+            } catch (NoSuchMethodException ignored) {
+                method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            }
+            try {
+                method.setAccessible(true);
+            } catch (Exception ignored) {
+                Field fieldTheUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
+                fieldTheUnsafe.setAccessible(true);
+                ((Unsafe) fieldTheUnsafe.get(null)).putBoolean(method, 12, true);
+            }
             for (File url : urls) {
                 method.invoke(loader, url.toURI().toURL());
             }
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | MalformedURLException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | MalformedURLException | NoSuchFieldException e) {
             throw new MCLException(e);
         }
     }
